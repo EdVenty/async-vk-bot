@@ -66,9 +66,11 @@ handlers = {
 #             func(event)
 
 class Bot:
-    def __init__(self, token, group_id, longpoll_api_version='5.124') -> None:
+    def __init__(self, token, group_id, longpoll_api_version='5.124', longpoll_wait=False, log_input_messages=True) -> None:
         if longpoll_api_version != '5.124': raise AssertionError("Longpoll api version must be 5.124")
         self.group_id = group_id
+        self.longpoll_wait = longpoll_wait
+        self.log_input_messages = log_input_messages
         self.event_loop = asyncio.get_event_loop()
         self.vk_session = vk_api.VkApi(token=token)
         self.vk: VkApiMethod = self.vk_session.get_api()
@@ -114,7 +116,7 @@ class Bot:
             await asyncio.sleep(interval)
 
     def listen(self):
-        longpoll = VkBotLongPoll(self.vk_session, self.group_id, wait=False)
+        longpoll = VkBotLongPoll(self.vk_session, self.group_id)
         crached = False
         while(True):
             try:
@@ -124,7 +126,7 @@ class Bot:
                 for event in longpoll.listen():
                     # evattr = EventAttributeGetter(event)
                     if event.type == VkBotEventType.MESSAGE_NEW:
-                        logging.info("New message: " + event.message.text)
+                        if self.log_input_messages: logging.info("New message: " + event.message.text)
                         for coro in handlers["on_message"]:
                             self.tasks_to_add.append(coro(event))
             except Exception as err:
