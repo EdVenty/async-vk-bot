@@ -1,5 +1,4 @@
 # async-vk-bot
-Just async vk bot
-
-## requirements
+Простая асинхронная библиотека, использующая механизмы стандартной библиотеки vk_api
+## Зависимости (requirements)
 * vk_api
