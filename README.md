@@ -24,12 +24,12 @@ async def on_message(event: VkBotMessageEvent):
 bot.run()
 ```
 Для отправки сообщений используйте асинхронный метод класса Bot.
-Так, как в вк разные механизмы для отправки пользователям и в беседы, то нужно использовать разные аргументы.
+Так, как в вк разные механизмы для отправки пользователям и в беседы, то нужно использовать разные методы.
 Отправка в беседу:
 ```python
-await bot.send(async_vk_bot.CHAT_PEER_ID, peer_id=event.message.peer_id, message=Сообщение)
+await bot.send_chat(peer_id=event.message.peer_id, message="сообщение")
 ```
 Отправка пользователю:
 ```python
-await bot.send(async_vk_bot.USER, user_id=event.message.from_id, message=сообщение)
+await bot.send_user(user_id=event.message.from_id, message="сообщение")
 ```
