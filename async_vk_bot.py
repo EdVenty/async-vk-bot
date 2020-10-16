@@ -22,7 +22,7 @@ USER_PEER_ID = 5
 STAGE_WRITING_EVENT_HANDLERS = 0
 STAGE_LOOPING_PROGRAMM = 1
 programm_stage = STAGE_WRITING_EVENT_HANDLERS
-handlers = {
+listeners = {
     "on_message": [],
 }
 user_commands = {}
@@ -57,7 +57,7 @@ class Bot:
     def on_message(self, from_user: bool = False, from_chat: bool = False,
                    from_group: bool = False, from_me: bool = False):
         def on_message_decorator(func):
-            handlers["on_message"].append(Bot._on_message(
+            listeners["on_message"].append(Bot._on_message(
                 Bot, from_user, from_chat, from_group, from_me)(func))
         return on_message_decorator
 
@@ -85,6 +85,12 @@ class Bot:
             self.vk.messages.send(peer_id=peer_id, random_id=await self.get_random_id(),  **kwargs)
         elif chat_type == USER_PEER_ID:
             self.vk.messages.send(peer_id=peer_id, random_id=await self.get_random_id(),  **kwargs)
+
+    async def send_user(self, user_id=None, **kwargs):
+        self.send(USER, user_id=user_id, **kwargs)
+
+    async def send_chat(self, peer_id=None, **kwargs):
+        self.send(CHAT_PEER_ID, peer_id=peer_id, **kwargs)
 
     async def task_manager(self, interval=0.1, ingnore_not_coro_tasks=True):
         while(True):
@@ -115,7 +121,7 @@ class Bot:
                     if event.type == VkBotEventType.MESSAGE_NEW:
                         if self.log_input_messages:
                             logging.info("New message: " + event.message.text)
-                        for coro in handlers["on_message"]:
+                        for coro in listeners["on_message"]:
                             self.tasks_to_add.append(coro(event))
                         # if event.from_user or event.message.text[0] == self.prefix:
                         #     if event.message.text[0] == self.prefix: 
